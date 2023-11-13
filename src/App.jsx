@@ -4,12 +4,14 @@ import userImg from './imgs/user.svg'
 import { useEffect, useState } from 'react';
 
 function App() {
-  const inputValue = JSON.parse(localStorage.getItem('inputNum')) || "Custom";
+  const inputValue = JSON.parse(localStorage.getItem('inputNum')) || null;
   const storedData = JSON.parse(localStorage.getItem('info')) || {};
 
   const [ bill, setBill ] = useState(storedData.bill || 0);
   const [ people, setPeople ] = useState(storedData.people || 1);
   const [ tip, setTip ] = useState(storedData.tip || 0);
+
+  const [ alarm, setAlarm ] = useState(false);
 
   const [ total, setTotal ] = useState(0);
   const [ tipPerPers, setTipPerPers ] = useState(0)
@@ -49,9 +51,11 @@ function App() {
 
   function handleTip(tipValue){
     tipValue === tip ? setTip() : setTip(tipValue);
+    setAlarm(true)
   }
 
   function handleTipChange(e){
+    setAlarm(false)
     const inputNum = e.target.valueAsNumber;
     if(e.target.value.trim() === "" ) {
       setTip(0)
@@ -70,16 +74,20 @@ function App() {
     setTip(inputNum);
   }
 
-  function handlePeople(e){
-    if(e.target.value.trim() === "" ||
-      e.target.value < 1) {
+  function handlePeople(e){  
+    if(
+      e.target.value <= 0 ||
+      e.target.value % 1 !== 0){
       setPeople(1);
       e.target.value = "";
       return
     }
+
     setPeople(e.target.valueAsNumber)
+    
   }
-  
+
+  console.log(people);
    return(
     <>
 
@@ -98,6 +106,7 @@ function App() {
             id="bill"
             onChange={handleBill}
             placeholder={bill}
+            value={bill === 0 ? '' : bill}
             />
             <img src={dollarImg} alt="" />
           </div>
@@ -118,9 +127,10 @@ function App() {
               })}
               <input 
               type="number"
-              placeholder={inputValue}
+              placeholder="Custom"
               className='tip'
               onChange={handleTipChange}
+              value={!alarm ? inputValue : ''}
               />
             </div>
           </div>
@@ -131,7 +141,8 @@ function App() {
             type="number" 
             id="ppl" 
             onChange={handlePeople}
-            placeholder={people}
+            placeholder={1}
+            value={people === 1 ? '' : people}
             />
             <img src={userImg} alt="" />
           </div>
@@ -161,6 +172,8 @@ function App() {
             setBill(0);
             setPeople(1);
             setTip(0);
+            setAlarm(true);
+            localStorage.setItem('inputNum', null)
           }}>
             reset
           </div>
