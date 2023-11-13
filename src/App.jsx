@@ -4,11 +4,11 @@ import userImg from './imgs/user.svg'
 import { useEffect, useState } from 'react';
 
 function App() {
-
+  const inputValue = JSON.parse(localStorage.getItem('inputNum')) || "Custom";
   const storedData = JSON.parse(localStorage.getItem('info')) || {};
 
   const [ bill, setBill ] = useState(storedData.bill || 0);
-  const [ people, setPeople ] = useState(storedData.people || 0);
+  const [ people, setPeople ] = useState(storedData.people || 1);
   const [ tip, setTip ] = useState(storedData.tip || 0);
 
   const [ total, setTotal ] = useState(0);
@@ -21,8 +21,6 @@ function App() {
     
   }, [tip, bill])
 
-
-
   useEffect(() => {
     const data = {
       bill: bill,
@@ -32,10 +30,6 @@ function App() {
 
     localStorage.setItem('info', JSON.stringify(data))
 
-    if(people === 0) {
-      setTipPerPers('0.00')
-      return;
-    }
     const newTipPerPers = (bill / 100 * tip / people).toFixed(2);
     setTipPerPers(newTipPerPers)
 
@@ -61,22 +55,25 @@ function App() {
     const inputNum = e.target.valueAsNumber;
     if(e.target.value.trim() === "" ) {
       setTip(0)
+      localStorage.setItem('inputNum', null)
       return
     } else if(
       inputNum > 100 ||
       inputNum <= 0 ){
       e.target.value = "";
-      setTip(0)
+      setTip(0);
+      localStorage.setItem('inputNum', null)
       return;
     }
 
+    localStorage.setItem('inputNum', JSON.stringify(inputNum))
     setTip(inputNum);
   }
 
   function handlePeople(e){
     if(e.target.value.trim() === "" ||
-      e.target.value <= 0) {
-      setPeople(0);
+      e.target.value < 1) {
+      setPeople(1);
       e.target.value = "";
       return
     }
@@ -101,7 +98,6 @@ function App() {
             id="bill"
             onChange={handleBill}
             placeholder={bill}
-            value={bill !== 0 && bill}
             />
             <img src={dollarImg} alt="" />
           </div>
@@ -122,10 +118,9 @@ function App() {
               })}
               <input 
               type="number"
-              placeholder='Custom'
+              placeholder={inputValue}
               className='tip'
               onChange={handleTipChange}
-              value={tip === 0 ? '' : tip === 5 ? '' : tip === 10 ? '' : tip === 15 ? '' : tip === 25 ? '' : tip === 50 ? '' : tip}
               />
             </div>
           </div>
@@ -137,7 +132,6 @@ function App() {
             id="ppl" 
             onChange={handlePeople}
             placeholder={people}
-            value={people !== 0 && people}
             />
             <img src={userImg} alt="" />
           </div>
@@ -165,8 +159,8 @@ function App() {
           <div className="reset-btn"
           onClick={() => {
             setBill(0);
-            setPeople(0)
-            setTip(0)
+            setPeople(1);
+            setTip(0);
           }}>
             reset
           </div>
