@@ -75,11 +75,11 @@ function App() {
   }
 
   function handlePeople(e){  
+    setAlarm(false)
     if(
       e.target.value <= 0 ||
       e.target.value % 1 !== 0){
       setPeople(1);
-      e.target.value = "";
       return
     }
 
@@ -142,7 +142,6 @@ function App() {
             id="ppl" 
             onChange={handlePeople}
             placeholder={1}
-            value={people === 1 ? '' : people}
             />
             <img src={userImg} alt="" />
           </div>
@@ -170,7 +169,6 @@ function App() {
           <div className="reset-btn"
           onClick={() => {
             setBill(0);
-            setPeople(1);
             setTip(0);
             setAlarm(true);
             localStorage.setItem('inputNum', null)
